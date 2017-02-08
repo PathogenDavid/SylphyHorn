@@ -44,11 +44,11 @@
 			</DoubleAnimationUsingKeyFrames>
 		</Storyboard>
 	</Window.Resources>
-	<Window.Triggers>
+	<!--<Window.Triggers>
 		<EventTrigger RoutedEvent="FrameworkElement.Loaded">
 			<BeginStoryboard Storyboard="{StaticResource FadeIn}" />
 		</EventTrigger>
-	</Window.Triggers>
+	</Window.Triggers>-->
 
 	<i:Interaction.Behaviors>
 		<livet:WindowCloseCancelBehavior CloseCanceledCallbackMethodTarget="{Binding}"

@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using MetroTrilithon.Lifetime;
+﻿using MetroTrilithon.Lifetime;
 using SylphyHorn.Properties;
 using SylphyHorn.Serialization;
 using SylphyHorn.UI;
 using SylphyHorn.UI.Bindings;
+using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using WindowsDesktop;
 
 namespace SylphyHorn.Services
@@ -18,8 +17,20 @@ namespace SylphyHorn.Services
 
 		private readonly SerialDisposable _notificationWindow = new SerialDisposable();
 
+		private const string desktopNamesFile = "DesktopNames.txt";
+		private string[] desktopNames;
+		private readonly object desktopNamesLock = new Object();
+		private FileSystemWatcher desktopNamesFileWatcher = null;
+
 		private NotificationService()
 		{
+			desktopNamesFileWatcher = new FileSystemWatcher(Environment.CurrentDirectory, desktopNamesFile);
+			desktopNamesFileWatcher.Created += DesktopNamesFileChanged;
+			desktopNamesFileWatcher.Changed += DesktopNamesFileChanged;
+			desktopNamesFileWatcher.Deleted += DesktopNamesFileChanged;
+			desktopNamesFileWatcher.Renamed += DesktopNamesFileChanged;
+			LoadDesktopNames();
+
 			VirtualDesktop.CurrentChanged += this.VirtualDesktopOnCurrentChanged;
 			VirtualDesktopService.WindowPinned += this.VirtualDesktopServiceOnWindowPinned;
 		}
@@ -45,13 +56,47 @@ namespace SylphyHorn.Services
 			});
 		}
 
-		private static IDisposable ShowDesktopWindow(int index)
+		private void LoadDesktopNames()
+		{
+			lock (desktopNamesLock)
+			{
+				if (!File.Exists(desktopNamesFile))
+				{
+					desktopNames = null;
+					return;
+				}
+
+				desktopNames = File.ReadAllLines(desktopNamesFile);
+			}
+		}
+
+		private void DesktopNamesFileChanged(object sender, FileSystemEventArgs e)
+		{ LoadDesktopNames(); }
+
+		private string GetDesktopName(int index)
+		{
+			string ret = null;
+			int zeroIndex = index - 1;
+
+			lock (desktopNamesLock)
+			{
+				if (desktopNames != null && zeroIndex >= 0 && zeroIndex < desktopNames.Length)
+				{ ret = desktopNames[zeroIndex]; }
+			}
+
+			if (String.IsNullOrWhiteSpace(ret))
+			{ ret = $"Desktop {index}"; }
+
+			return ret;
+		}
+
+		private IDisposable ShowDesktopWindow(int index)
 		{
 			var vmodel = new NotificationWindowViewModel
 			{
 				Title = ProductInfo.Title,
 				Header = "Virtual Desktop Switched",
-				Body = "Current Desktop: Desktop " + index,
+				Body = GetDesktopName(index),
 			};
 			var source = new CancellationTokenSource();
 			var window = new NotificationWindow()
@@ -89,6 +134,8 @@ namespace SylphyHorn.Services
 
 		public void Dispose()
 		{
+			desktopNamesFileWatcher.Dispose();
+
 			VirtualDesktop.CurrentChanged -= this.VirtualDesktopOnCurrentChanged;
 			VirtualDesktopService.WindowPinned -= this.VirtualDesktopServiceOnWindowPinned;
 

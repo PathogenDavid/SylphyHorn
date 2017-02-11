@@ -29,6 +29,8 @@ namespace SylphyHorn.Services
 			desktopNamesFileWatcher.Changed += DesktopNamesFileChanged;
 			desktopNamesFileWatcher.Deleted += DesktopNamesFileChanged;
 			desktopNamesFileWatcher.Renamed += DesktopNamesFileChanged;
+			desktopNamesFileWatcher.EnableRaisingEvents = true;
+
 			LoadDesktopNames();
 
 			VirtualDesktop.CurrentChanged += this.VirtualDesktopOnCurrentChanged;

@@ -153,8 +153,8 @@
       <HintPath>..\packages\LivetExtensions.1.1.0.0\lib\net45\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Open.WinKeyboardHook, Version=1.0.11.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Open.WinKeyboardHook.1.0.11\lib\net45\Open.WinKeyboardHook.dll</HintPath>
+    <Reference Include="Open.WinKeyboardHook, Version=1.0.14.0, Culture=neutral, PublicKeyToken=df1764df09aef66e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Open.WinKeyboardHook.1.0.14\lib\net40\Open.WinKeyboardHook.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="StatefulModel, Version=0.5.0.0, Culture=neutral, processorArchitecture=MSIL">
